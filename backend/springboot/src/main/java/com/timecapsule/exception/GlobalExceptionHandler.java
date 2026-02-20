@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -23,8 +24,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Object>> handleBusinessException(BusinessException e) {
         log.warn("业务异常: {}", e.getMessage());
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.error(400, e.getMessage()));
+        
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.error(errorCode.getCode(), e.getMessage()));
     }
     
     /**
@@ -39,9 +43,14 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         
+        String errorMessage = errors.entrySet().stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .collect(Collectors.joining("; "));
+        
         log.warn("参数验证失败: {}", errors);
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.error(400, "参数验证失败: " + errors.toString()));
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(ErrorCode.VALIDATION_ERROR.getCode(), errorMessage));
     }
     
     /**
@@ -57,8 +66,10 @@ public class GlobalExceptionHandler {
         });
         
         log.warn("绑定异常: {}", errors);
-        return ResponseEntity.badRequest()
-                .body(ApiResponse.error(400, "绑定失败: " + errors.toString()));
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(ErrorCode.VALIDATION_ERROR.getCode(), 
+                    "数据验证失败: " + errors.toString()));
     }
     
     /**
@@ -67,7 +78,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception e) {
         log.error("系统异常: ", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(500, "系统内部错误"));
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(ErrorCode.INTERNAL_ERROR.getCode(), "服务器内部错误"));
     }
 }

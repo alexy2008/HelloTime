@@ -56,11 +56,11 @@
             <div class="capsule-meta">
               <div class="meta-item">
                 <span class="label">作者:</span>
-                <span class="value">{{ capsule.author || '匿名' }}</span>
+                <span class="value">{{ capsule.creatorNickname || capsule.author || '匿名' }}</span>
               </div>
               <div class="meta-item">
                 <span class="label">创建时间:</span>
-                <span class="value">{{ formatDate(capsule.createTime) }}</span>
+                <span class="value">{{ formatDate(capsule.createdAt || capsule.createTime) }}</span>
               </div>
               <div class="meta-item">
                 <span class="label">开启时间:</span>
@@ -68,8 +68,8 @@
               </div>
               <div class="meta-item">
                 <span class="label">状态:</span>
-                <span class="value" :class="{ 'status-open': capsule.isOpen }">
-                  {{ capsule.isOpen ? '已开启' : '未开启' }}
+                <span class="value" :class="{ 'status-open': capsule.canOpen || capsule.isOpen }">
+                  {{ (capsule.canOpen || capsule.isOpen) ? '已开启' : '未开启' }}
                 </span>
               </div>
             </div>
@@ -85,9 +85,9 @@
               <button 
                 @click="openDeleteModal(capsule)" 
                 class="btn btn-danger"
-                :disabled="deletingId === capsule.id"
+                :disabled="deletingCode === capsule.capsuleCode"
               >
-                {{ deletingId === capsule.id ? '删除中...' : '删除' }}
+                {{ deletingCode === capsule.capsuleCode ? '删除中...' : '删除' }}
               </button>
             </div>
           </div>
@@ -95,6 +95,27 @@
         
         <div v-else class="empty-state">
           <p>暂无胶囊数据</p>
+        </div>
+        
+        <!-- 分页 -->
+        <div v-if="pagination.totalPages > 1" class="pagination">
+          <button 
+            class="btn btn-secondary"
+            :disabled="pagination.currentPage === 1"
+            @click="loadCapsules(pagination.currentPage - 1)"
+          >
+            上一页
+          </button>
+          <span class="page-info">
+            第 {{ pagination.currentPage }} / {{ pagination.totalPages }} 页
+          </span>
+          <button 
+            class="btn btn-secondary"
+            :disabled="pagination.currentPage === pagination.totalPages"
+            @click="loadCapsules(pagination.currentPage + 1)"
+          >
+            下一页
+          </button>
         </div>
       </div>
 
@@ -111,9 +132,9 @@
             <button 
               @click="confirmDelete" 
               class="btn btn-danger"
-              :disabled="deletingId === capsuleToDelete?.id"
+              :disabled="deletingCode === capsuleToDelete?.capsuleCode"
             >
-              {{ deletingId === capsuleToDelete?.id ? '删除中...' : '确认删除' }}
+              {{ deletingCode === capsuleToDelete?.capsuleCode ? '删除中...' : '确认删除' }}
             </button>
           </div>
         </div>
@@ -135,11 +156,17 @@ const toast = useToast()
 const isAdmin = ref(false)
 const password = ref('')
 const isLoading = ref(false)
-const deletingId = ref(null)
+const deletingCode = ref(null)
 const capsules = ref([])
 const searchKeyword = ref('')
 const showDeleteModal = ref(false)
 const capsuleToDelete = ref(null)
+const pagination = ref({
+  currentPage: 1,
+  pageSize: 20,
+  totalItems: 0,
+  totalPages: 0
+})
 
 const filteredCapsules = computed(() => {
   if (!searchKeyword.value) {
@@ -167,20 +194,23 @@ const handleLogin = async () => {
     isAdmin.value = true
     loadCapsules()
   } catch (error) {
-    toast.error(error.response?.data?.message || error.message || '登录失败')
+    toast.error(error.message || '登录失败')
   } finally {
     isLoading.value = false
   }
 }
 
-const loadCapsules = async () => {
+const loadCapsules = async (page = 1) => {
   isLoading.value = true
   
   try {
-    const response = await adminApi.getAll()
-    capsules.value = response.data
+    const response = await adminApi.getAll(page, pagination.value.pageSize)
+    capsules.value = response.data.items || response.data
+    if (response.data.pagination) {
+      pagination.value = response.data.pagination
+    }
   } catch (error) {
-    toast.error(error.response?.data?.message || error.message || '加载失败')
+    toast.error(error.message || '加载失败')
   } finally {
     isLoading.value = false
   }
@@ -198,17 +228,17 @@ const cancelDelete = () => {
 
 const confirmDelete = async () => {
   if (!capsuleToDelete.value) return
-  const id = capsuleToDelete.value.id
-  deletingId.value = id
+  const capsuleCode = capsuleToDelete.value.capsuleCode
+  deletingCode.value = capsuleCode
 
   try {
-    await adminApi.delete(id)
-    capsules.value = capsules.value.filter(c => c.id !== id)
+    await adminApi.delete(capsuleCode)
+    capsules.value = capsules.value.filter(c => c.capsuleCode !== capsuleCode)
     toast.success('删除成功')
   } catch (error) {
-    toast.error(error.response?.data?.message || error.message || '删除失败')
+    toast.error(error.message || '删除失败')
   } finally {
-    deletingId.value = null
+    deletingCode.value = null
     showDeleteModal.value = false
     capsuleToDelete.value = null
   }
@@ -234,7 +264,7 @@ onMounted(() => {
 .admin {
   padding: 40px 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-border) 100%);
 }
 
 .login-form {
@@ -297,21 +327,21 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .capsule-header h3 {
   margin: 0;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .capsule-code {
-  background: #f3f4f6;
+  background: var(--color-bg);
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-family: monospace;
   font-size: 0.875rem;
-  color: #4f46e5;
+  color: var(--color-primary);
   font-weight: 500;
 }
 
@@ -329,9 +359,21 @@ onMounted(() => {
 .content-text {
   margin-top: 0.5rem;
   margin-bottom: 0;
-  white-space: pre-wrap;
+  var(--color-bg-card)-space: pre-wrap;
   line-height: 1.6;
-  color: #4b5563;
+  color: var(--color-text-secondary);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.page-info {
+  color: var(--color-text-secondary);
 }
 
 .modal-overlay {
@@ -345,7 +387,7 @@ onMounted(() => {
 }
 
 .modal-content {
-  background: #ffffff;
+  background: var(--color-bg-card);
   border-radius: 12px;
   padding: 24px;
   max-width: 400px;
@@ -356,17 +398,17 @@ onMounted(() => {
 .modal-title {
   margin-bottom: 12px;
   font-size: 1.25rem;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .modal-text {
   margin-bottom: 20px;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .modal-text span {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .modal-actions {
@@ -382,15 +424,15 @@ onMounted(() => {
 
 .label {
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .value {
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .status-open {
-  color: #10b981;
+  color: var(--color-success);
   font-weight: 500;
 }
 
@@ -401,8 +443,8 @@ onMounted(() => {
 }
 
 .btn-danger {
-  background-color: #ef4444;
-  color: white;
+  background-color: var(--color-error);
+  color: var(--color-bg-card);
 }
 
 .btn-danger:hover {
@@ -412,6 +454,6 @@ onMounted(() => {
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 </style>

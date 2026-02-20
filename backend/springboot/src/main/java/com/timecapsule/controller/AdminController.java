@@ -1,9 +1,8 @@
 package com.timecapsule.controller;
 
-import com.timecapsule.dto.AdminLoginRequest;
-import com.timecapsule.dto.ApiResponse;
-import com.timecapsule.dto.CapsuleResponse;
-import com.timecapsule.dto.JwtResponse;
+import com.timecapsule.dto.*;
+import com.timecapsule.exception.BusinessException;
+import com.timecapsule.exception.ErrorCode;
 import com.timecapsule.service.AdminService;
 import com.timecapsule.service.CapsuleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -42,51 +39,54 @@ public class AdminController {
     }
     
     /**
-     * 获取所有胶囊（需要管理员权限）
+     * 获取所有胶囊（需要管理员权限）- 分页
      */
-    @Operation(summary = "获取所有胶囊", description = "获取所有胶囊列表，需要Bearer Token认证")
+    @Operation(summary = "获取所有胶囊", description = "获取所有胶囊列表，支持分页，需要Bearer Token认证")
     @GetMapping("/capsules")
-    public ResponseEntity<ApiResponse<List<CapsuleResponse>>> getAllCapsules(
+    public ResponseEntity<ApiResponse<PageResponse<CapsuleResponse>>> getAllCapsules(
+            @Parameter(description = "页码（从1开始）", example = "1")
+            @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "每页数量", example = "20")
+            @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "排序字段和方向", example = "createdAt,desc")
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
             HttpServletRequest request) {
-        log.info("获取所有胶囊列表");
+        log.info("获取所有胶囊列表: page={}, size={}", page, size);
         
         // 验证管理员权限
         String token = extractToken(request);
         if (token == null || !adminService.validateToken(token)) {
-            return ResponseEntity.status(401)
-                    .body(ApiResponse.error(401, "未授权访问"));
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "未授权访问");
         }
         
-        List<CapsuleResponse> capsules = capsuleService.getAllCapsules();
-        return ResponseEntity.ok(ApiResponse.success(capsules));
+        PageResponse<CapsuleResponse> capsules = capsuleService.getAllCapsules(page, size, sort);
+        return ResponseEntity.ok(ApiResponse.success("获取成功", capsules));
     }
     
     /**
      * 删除胶囊（需要管理员权限）
      */
-    @Operation(summary = "删除胶囊", description = "根据ID删除胶囊，需要Bearer Token认证")
-    @DeleteMapping("/capsules/{id}")
-    public ResponseEntity<ApiResponse<Object>> deleteCapsule(
-            @Parameter(description = "胶囊ID", example = "1")
-            @PathVariable Long id,
+    @Operation(summary = "删除胶囊", description = "根据胶囊码删除胶囊，需要Bearer Token认证")
+    @DeleteMapping("/capsules/{capsuleCode}")
+    public ResponseEntity<ApiResponse<CapsuleResponse>> deleteCapsule(
+            @Parameter(description = "8位胶囊码", example = "A3X9K2M7")
+            @PathVariable String capsuleCode,
             HttpServletRequest request) {
-        log.info("删除胶囊请求: id={}", id);
-        
-        // 验证ID参数
-        if (id == null) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(400, "ID参数不能为空"));
-        }
+        log.info("删除胶囊请求: code={}", capsuleCode);
         
         // 验证管理员权限
         String token = extractToken(request);
         if (token == null || !adminService.validateToken(token)) {
-            return ResponseEntity.status(401)
-                    .body(ApiResponse.error(401, "未授权访问"));
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "未授权访问");
         }
         
-        capsuleService.deleteCapsule(id);
-        return ResponseEntity.ok(ApiResponse.success("删除成功", null));
+        // 验证胶囊码格式
+        if (!capsuleService.isValidCapsuleCode(capsuleCode)) {
+            throw new BusinessException(ErrorCode.INVALID_CAPSULE_CODE, "无效的胶囊码");
+        }
+        
+        CapsuleResponse response = capsuleService.deleteCapsuleByCode(capsuleCode);
+        return ResponseEntity.ok(ApiResponse.success("胶囊删除成功", response));
     }
     
     /**

@@ -1,4 +1,4 @@
-/* 全局样式变量 */
+/* 全局样式变量 - 明亮模式 */
 :root {
   /* 主色调 */
   --color-primary: #4f46e5;
@@ -38,6 +38,40 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* 暗色主题 */
+[data-theme="dark"] {
+  /* 主色调 */
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  
+  /* 辅助色 */
+  --color-secondary: #818cf8;
+  
+  /* 中性色 */
+  --color-bg: #111827;
+  --color-bg-card: #1f2937;
+  --color-text: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-border: #374151;
+  
+  /* 状态色 */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #60a5fa;
+  
+  /* 蓝色和绿色按钮 */
+  --color-blue: #60a5fa;
+  --color-blue-hover: #3b82f6;
+  --color-green: #34d399;
+  --color-green-hover: #10b981;
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
 /* 重置样式 */
@@ -95,7 +129,7 @@ body {
 }
 
 .btn-secondary {
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-card);
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }

@@ -1,0 +1,170 @@
+.home {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--color-bg);
+  padding-top: 70px;
+}
+
+.hero {
+  text-align: center;
+  max-width: 600px;
+}
+
+.logo {
+  margin-bottom: 2rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logo-image {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 1rem;
+  transition: transform 0.2s;
+}
+
+.logo:hover .logo-image {
+  transform: scale(1.1);
+}
+
+.logo-text {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.subtitle {
+  margin-top: 0.75rem;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.btn-publish {
+  background-color: #3b82f6; /* 蓝色 */
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-publish:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+.btn-open {
+  background-color: #10b981; /* 绿色 */
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-open:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+}
+
+.about-link {
+  margin-top: 1rem;
+}
+
+.about-text {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.about-text:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.modal-content {
+  background: var(--color-bg-card);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .home {
+    padding-top: 60px;
+  }
+
+  .logo-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .logo-text {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .btn-publish,
+  .btn-open {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+  }
+}

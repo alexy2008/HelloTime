@@ -3,6 +3,7 @@ package com.timecapsule.service;
 import com.timecapsule.dto.AdminLoginRequest;
 import com.timecapsule.dto.JwtResponse;
 import com.timecapsule.exception.BusinessException;
+import com.timecapsule.exception.ErrorCode;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -35,13 +36,13 @@ public class AdminService {
         log.info("管理员尝试登录");
         
         if (!adminPassword.equals(request.getPassword())) {
-            throw new BusinessException("密码错误");
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD, "密码错误");
         }
         
         String token = generateToken();
         log.info("管理员登录成功");
         
-        return new JwtResponse(token);
+        return new JwtResponse(token, jwtExpiration / 1000); // 返回秒数
     }
     
     /**

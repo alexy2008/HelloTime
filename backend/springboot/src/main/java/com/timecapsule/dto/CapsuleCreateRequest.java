@@ -11,16 +11,17 @@ import java.time.LocalDateTime;
 public class CapsuleCreateRequest {
     
     @NotBlank(message = "标题不能为空")
-    @Size(max = 100, message = "标题长度不能超过100个字符")
+    @Size(min = 1, max = 100, message = "标题长度必须在1-100个字符之间")
     private String title;
     
     @NotBlank(message = "内容不能为空")
-    @Size(max = 1000, message = "内容长度不能超过1000个字符")
+    @Size(min = 1, max = 10000, message = "内容长度必须在1-10000个字符之间")
     private String content;
     
     @NotNull(message = "开启时间不能为空")
     private LocalDateTime openTime;
     
-    @Size(max = 50, message = "作者名称长度不能超过50个字符")
-    private String author;
+    @NotBlank(message = "发布者昵称不能为空")
+    @Size(min = 1, max = 50, message = "昵称长度必须在1-50个字符之间")
+    private String creatorNickname;
 }

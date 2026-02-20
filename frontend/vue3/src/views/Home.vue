@@ -3,8 +3,8 @@
     <div class="container">
       <div class="hero">
         <div class="logo">
-          <div class="logo-icon">🕐</div>
-          <h1 class="logo-text">Time Capsule</h1>
+          <img src="/tclogo.png" alt="Time Capsule Logo" class="logo-image">
+          <h1 class="logo-text">时间胶囊</h1>
         </div>
         <p class="subtitle">写给未来自己的时间胶囊</p>
         <div class="actions">
@@ -86,20 +86,21 @@ const lookupCapsule = () => {
   user-select: none;
 }
 
-.logo-icon {
-  font-size: 4rem;
+.logo-image {
+  width: 150px;
+  height: 150px;
   margin-bottom: 1rem;
   transition: transform 0.2s;
 }
 
-.logo:hover .logo-icon {
+.logo:hover .logo-image {
   transform: scale(1.1);
 }
 
 .logo-text {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -107,7 +108,7 @@ const lookupCapsule = () => {
   margin-top: 0.75rem;
   margin-bottom: 2rem;
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .actions {
@@ -120,7 +121,7 @@ const lookupCapsule = () => {
 
 .btn-publish {
   background-color: #3b82f6; /* 蓝色 */
-  color: white;
+  color: var(--color-bg-card);
   border: none;
   padding: 1rem 2rem;
   font-size: 1.1rem;
@@ -137,8 +138,8 @@ const lookupCapsule = () => {
 }
 
 .btn-open {
-  background-color: #10b981; /* 绿色 */
-  color: white;
+  background-color: var(--color-success); /* 绿色 */
+  color: var(--color-bg-card);
   border: none;
   padding: 1rem 2rem;
   font-size: 1.1rem;
@@ -157,14 +158,14 @@ const lookupCapsule = () => {
 }
 
 .about-text {
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .about-text:hover {
-  color: #4b5563;
+  color: var(--color-text);
   text-decoration: underline;
 }
 
@@ -178,16 +179,16 @@ const lookupCapsule = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1001;
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-bg-card);
   padding: 2rem;
   border-radius: 12px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
 }
 
 .form-group {
@@ -198,5 +199,31 @@ const lookupCapsule = () => {
   display: flex;
   gap: 1rem;
   justify-content: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .logo-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .logo-text {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .btn-publish,
+  .btn-open {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+  }
 }
 </style>

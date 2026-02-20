@@ -3,9 +3,9 @@
     <div class="container">
       <div class="card">
         <div class="about-header" @click="handleLogoClick">
-          <div class="logo-icon">🕐</div>
+          <img src="/tclogo.png" alt="Time Capsule Logo" class="logo-image">
           <div class="title-group">
-            <h1>关于 Time Capsule</h1>
+            <h1>关于时间胶囊</h1>
             <p class="version">版本 {{ appVersion }}</p>
             <p class="hint-text">（在此处快速点击5次进入管理员界面）</p>
           </div>
@@ -148,7 +148,7 @@ const handleLogoClick = () => {
 .about {
   padding: 40px 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-border) 100%);
 }
 
 .card {
@@ -159,31 +159,38 @@ const handleLogoClick = () => {
 .about-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-bottom: 2rem;
   cursor: pointer;
   user-select: none;
 }
 
-.logo-icon {
-  font-size: 3rem;
+.logo-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  transition: transform 0.2s;
+}
+
+.about-header:hover .logo-image {
+  transform: scale(1.05);
 }
 
 .title-group h1 {
   margin: 0;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .version {
   margin: 0.25rem 0 0;
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .hint-text {
   margin: 0.25rem 0 0;
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--color-text-secondary);
 }
 
 .section {
@@ -191,15 +198,15 @@ const handleLogoClick = () => {
 }
 
 .section h2 {
-  color: #374151;
+  color: var(--color-text);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--color-border);
 }
 
 .section p {
   line-height: 1.8;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .features {
@@ -209,14 +216,14 @@ const handleLogoClick = () => {
 .features li {
   padding: 1rem;
   margin-bottom: 0.5rem;
-  background: #f9fafb;
+  background: var(--color-bg);
   border-radius: 8px;
-  border-left: 4px solid #4f46e5;
+  border-left: 4px solid var(--color-primary);
 }
 
 .features strong {
   display: block;
-  color: #1f2937;
+  color: var(--color-text);
   margin-bottom: 0.25rem;
 }
 
@@ -234,7 +241,7 @@ const handleLogoClick = () => {
 .step-number {
   width: 40px;
   height: 40px;
-  background: #4f46e5;
+  background: var(--color-primary);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -246,12 +253,12 @@ const handleLogoClick = () => {
 
 .step-content h3 {
   margin: 0 0 0.5rem 0;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .step-content p {
   margin: 0;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .privacy-list,
@@ -262,7 +269,7 @@ const handleLogoClick = () => {
 .privacy-list li,
 .contact-list li {
   margin-bottom: 0.5rem;
-  color: #4b5563;
+  color: var(--color-text-secondary);
 }
 
 .tech-stack {
@@ -272,9 +279,9 @@ const handleLogoClick = () => {
 
 .tech-item {
   padding: 1rem;
-  background: #f3f4f6;
+  background: var(--color-bg);
   border-radius: 8px;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .footer-actions {
@@ -283,6 +290,73 @@ const handleLogoClick = () => {
   justify-content: center;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+  }
+
+  .about-header {
+    gap: 1rem;
+  }
+
+  .logo-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .title-group h1 {
+    font-size: 1.5rem;
+  }
+
+  .version {
+    font-size: 0.8rem;
+  }
+
+  .hint-text {
+    font-size: 0.7rem;
+  }
+
+  .section h2 {
+    font-size: 1.25rem;
+  }
+
+  .section p {
+    font-size: 0.9rem;
+  }
+
+  .features li {
+    padding: 0.875rem;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .step-content h3 {
+    font-size: 1rem;
+  }
+
+  .step-content p {
+    font-size: 0.875rem;
+  }
+
+  .tech-stack {
+    gap: 0.875rem;
+  }
+
+  .tech-item {
+    padding: 0.875rem;
+  }
 }
 </style>

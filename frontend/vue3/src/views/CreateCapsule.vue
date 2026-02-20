@@ -185,7 +185,7 @@ const copyCode = async () => {
 .create-capsule {
   padding: 40px 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-border) 100%);
 }
 
 .card {
@@ -196,7 +196,7 @@ const copyCode = async () => {
 .card h1 {
   text-align: center;
   margin-bottom: 2rem;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 /* 成功界面样式 */
@@ -208,10 +208,10 @@ const copyCode = async () => {
 }
 
 .success-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 16px;
   padding: 3rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   text-align: center;
   max-width: 500px;
   width: 100%;
@@ -224,7 +224,7 @@ const copyCode = async () => {
 .success-icon {
   width: 80px;
   height: 80px;
-  background: #10b981;
+  background: var(--color-success);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -236,7 +236,7 @@ const copyCode = async () => {
 }
 
 .success-header h1 {
-  color: #1f2937;
+  color: var(--color-text);
   margin: 0;
   font-size: 2rem;
 }
@@ -246,7 +246,7 @@ const copyCode = async () => {
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 1.1rem;
   margin-bottom: 1.5rem;
 }
@@ -255,16 +255,16 @@ const copyCode = async () => {
   font-size: 2.5rem;
   font-weight: 800;
   letter-spacing: 0.3rem;
-  background: #f3f4f6;
+  background: var(--color-bg);
   padding: 1.5rem;
   border-radius: 12px;
   margin: 1.5rem 0;
-  color: #1f2937;
+  color: var(--color-text);
   font-family: 'Courier New', monospace;
 }
 
 .tip {
-  color: #6b7280;
+  color: var(--color-text-secondary);
   margin: 1.5rem 0;
   font-size: 0.9rem;
   line-height: 1.6;
@@ -293,13 +293,13 @@ const copyCode = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1001;
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
   max-width: 400px;
   width: 90%;
   overflow: hidden;
@@ -307,12 +307,12 @@ const copyCode = async () => {
 
 .confirm-modal .modal-header {
   padding: 1.5rem 1.5rem 0.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .confirm-modal .modal-header h3 {
   margin: 0;
-  color: #1f2937;
+  color: var(--color-text);
   font-size: 1.25rem;
   font-weight: 600;
 }
@@ -323,7 +323,7 @@ const copyCode = async () => {
 
 .confirm-modal .modal-body p {
   margin: 0;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
@@ -348,7 +348,7 @@ const copyCode = async () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text);
 }
 
 textarea.input {
@@ -357,7 +357,7 @@ textarea.input {
 }
 
 .error {
-  color: #ef4444;
+  color: var(--color-error);
   font-size: 0.875rem;
   margin-top: 0.25rem;
   display: block;

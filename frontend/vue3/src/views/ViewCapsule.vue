@@ -149,7 +149,7 @@ onUnmounted(() => {
 .view-capsule {
   padding: 40px 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-border) 100%);
 }
 
 .loading {
@@ -160,8 +160,8 @@ onUnmounted(() => {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #4f46e5;
+  border: 4px solid var(--color-border);
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -180,11 +180,11 @@ onUnmounted(() => {
 .capsule-content h1 {
   text-align: center;
   margin-bottom: 2rem;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .capsule-meta {
-  background: #f9fafb;
+  background: var(--color-bg);
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 2rem;
@@ -202,11 +202,11 @@ onUnmounted(() => {
 
 .label {
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .value {
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .countdown-section {
@@ -216,7 +216,7 @@ onUnmounted(() => {
 
 .countdown h3 {
   margin-bottom: 1.5rem;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .timer {
@@ -227,8 +227,8 @@ onUnmounted(() => {
 }
 
 .time-unit {
-  background: #4f46e5;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-bg-card);
   padding: 1rem;
   border-radius: 8px;
   min-width: 80px;
@@ -253,16 +253,16 @@ onUnmounted(() => {
 
 .content-section h3 {
   margin-bottom: 1rem;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .content {
-  background: #f9fafb;
+  background: var(--color-bg);
   padding: 1.5rem;
   border-radius: 8px;
   line-height: 1.8;
-  white-space: pre-wrap;
-  border-left: 4px solid #4f46e5;
+  var(--color-bg-card)-space: pre-wrap;
+  border-left: 4px solid var(--color-primary);
 }
 
 .actions {
@@ -274,5 +274,56 @@ onUnmounted(() => {
   max-width: 500px;
   margin: 0 auto;
   text-align: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .capsule-content {
+    max-width: 100%;
+  }
+
+  .capsule-content h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .capsule-meta {
+    padding: 1rem;
+  }
+
+  .meta-item {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .timer {
+    gap: 0.5rem;
+  }
+
+  .time-unit {
+    min-width: 60px;
+    padding: 0.75rem;
+  }
+
+  .number {
+    font-size: 1.5rem;
+  }
+
+  .unit {
+    font-size: 0.75rem;
+  }
+
+  .content {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .content-section h3 {
+    font-size: 1rem;
+  }
+
+  .countdown h3 {
+    font-size: 1rem;
+  }
 }
 </style>

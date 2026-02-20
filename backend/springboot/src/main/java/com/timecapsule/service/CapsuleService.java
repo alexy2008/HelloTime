@@ -2,12 +2,18 @@ package com.timecapsule.service;
 
 import com.timecapsule.dto.CapsuleCreateRequest;
 import com.timecapsule.dto.CapsuleResponse;
+import com.timecapsule.dto.PageResponse;
 import com.timecapsule.exception.BusinessException;
+import com.timecapsule.exception.ErrorCode;
 import com.timecapsule.model.Capsule;
 import com.timecapsule.repository.CapsuleRepository;
 import com.timecapsule.util.CapsuleCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +39,7 @@ public class CapsuleService {
         
         // 验证开启时间必须是未来时间
         if (request.getOpenTime().isBefore(LocalDateTime.now())) {
-            throw new BusinessException("开启时间必须是未来时间");
+            throw new BusinessException(ErrorCode.INVALID_OPEN_TIME, "开启时间必须是未来的时间");
         }
         
         // 生成唯一的胶囊码
@@ -43,7 +49,7 @@ public class CapsuleService {
             capsuleCode = codeGenerator.generateCode();
             attempts++;
             if (attempts > 10) {
-                throw new BusinessException("生成胶囊码失败，请稍后重试");
+                throw new BusinessException(ErrorCode.INTERNAL_ERROR, "生成胶囊码失败，请稍后重试");
             }
         } while (capsuleRepository.existsByCapsuleCode(capsuleCode));
         
@@ -53,14 +59,14 @@ public class CapsuleService {
         capsule.setTitle(request.getTitle());
         capsule.setContent(request.getContent());
         capsule.setOpenTime(request.getOpenTime());
-        capsule.setAuthor(request.getAuthor());
+        capsule.setCreatorNickname(request.getCreatorNickname());
         capsule.setIsDeleted(false);
         
         // 保存到数据库
         Capsule savedCapsule = capsuleRepository.save(capsule);
         log.info("胶囊创建成功: id={}, code={}", savedCapsule.getId(), savedCapsule.getCapsuleCode());
         
-        return CapsuleResponse.fromEntity(savedCapsule);
+        return CapsuleResponse.fromEntity(savedCapsule, false);
     }
     
     /**
@@ -71,56 +77,68 @@ public class CapsuleService {
         log.info("查询胶囊: code={}", capsuleCode);
         
         Capsule capsule = capsuleRepository.findByCapsuleCodeAndNotDeleted(capsuleCode)
-                .orElseThrow(() -> new BusinessException("胶囊不存在或已被删除"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CAPSULE_NOT_FOUND, 
+                    "未找到该胶囊，请检查胶囊码是否正确"));
         
-        // 如果未到开启时间，隐藏内容
-        if (!capsule.isOpen()) {
-            capsule.setContent(null);
-        }
-        
-        return CapsuleResponse.fromEntity(capsule);
+        return CapsuleResponse.fromEntity(capsule, true);
     }
     
     /**
-     * 获取胶囊状态信息（不包含内容）
+     * 根据胶囊码删除胶囊（管理员功能）
      */
-    @Transactional(readOnly = true)
-    public CapsuleResponse getCapsuleStatus(String capsuleCode) {
-        log.info("查询胶囊状态: code={}", capsuleCode);
+    public CapsuleResponse deleteCapsuleByCode(@NonNull String capsuleCode) {
+        log.info("删除胶囊: code={}", capsuleCode);
         
         Capsule capsule = capsuleRepository.findByCapsuleCodeAndNotDeleted(capsuleCode)
-                .orElseThrow(() -> new BusinessException("胶囊不存在或已被删除"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CAPSULE_NOT_FOUND, "未找到该胶囊"));
         
-        CapsuleResponse response = CapsuleResponse.fromEntity(capsule);
-        response.setContent(null); // 不返回内容
+        capsule.setIsDeleted(true);
+        capsuleRepository.save(capsule);
+        
+        CapsuleResponse response = new CapsuleResponse();
+        response.setCapsuleCode(capsuleCode);
+        response.setCreatedAt(LocalDateTime.now());
         return response;
     }
     
     /**
-     * 获取所有未删除的胶囊（管理员使用）
+     * 获取所有未删除的胶囊（管理员使用）- 分页
      */
     @Transactional(readOnly = true)
-    public List<CapsuleResponse> getAllCapsules() {
-        log.info("获取所有胶囊列表");
+    public PageResponse<CapsuleResponse> getAllCapsules(int page, int size, String sort) {
+        log.info("获取所有胶囊列表: page={}, size={}, sort={}", page, size, sort);
         
-        List<Capsule> capsules = capsuleRepository.findAllNotDeleted();
-        return capsules.stream()
-                .map(CapsuleResponse::fromEntity)
+        // 解析排序参数，映射 createdAt -> createTime
+        Sort sorting = Sort.by(Sort.Direction.DESC, "createTime");
+        if (sort != null && !sort.isEmpty()) {
+            String[] parts = sort.split(",");
+            if (parts.length == 2) {
+                Sort.Direction direction = "asc".equalsIgnoreCase(parts[1]) 
+                    ? Sort.Direction.ASC : Sort.Direction.DESC;
+                String field = parts[0];
+                // 映射 createdAt -> createTime
+                if ("createdAt".equals(field)) {
+                    field = "createTime";
+                }
+                sorting = Sort.by(direction, field);
+            }
+        }
+        
+        Pageable pageable = PageRequest.of(page - 1, Math.min(size, 100), sorting);
+        Page<Capsule> capsulePage = capsuleRepository.findAllNotDeleted(pageable);
+        
+        List<CapsuleResponse> items = capsulePage.getContent().stream()
+                .map(capsule -> CapsuleResponse.fromEntity(capsule, true))
                 .collect(Collectors.toList());
-    }
-    
-    /**
-     * 删除胶囊（管理员功能）
-     */
-    public void deleteCapsule(@NonNull Long id) {
-        log.info("删除胶囊: id={}", id);
         
-        Capsule capsule = capsuleRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("胶囊不存在"));
+        PageResponse.Pagination pagination = new PageResponse.Pagination(
+            capsulePage.getNumber() + 1,
+            capsulePage.getSize(),
+            capsulePage.getTotalElements(),
+            capsulePage.getTotalPages()
+        );
         
-        capsule.setIsDeleted(true);
-        capsuleRepository.save(capsule);
-        log.info("胶囊删除成功: id={}", id);
+        return new PageResponse<>(items, pagination);
     }
     
     /**

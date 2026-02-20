@@ -1,6 +1,8 @@
 package com.timecapsule.repository;
 
 import com.timecapsule.model.Capsule;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,7 +21,13 @@ public interface CapsuleRepository extends JpaRepository<Capsule, Long> {
     Optional<Capsule> findByCapsuleCodeAndNotDeleted(String capsuleCode);
     
     /**
-     * 查找所有未删除的胶囊
+     * 查找所有未删除的胶囊（分页）
+     */
+    @Query("SELECT c FROM Capsule c WHERE c.isDeleted = false")
+    Page<Capsule> findAllNotDeleted(Pageable pageable);
+    
+    /**
+     * 查找所有未删除的胶囊（不分页）
      */
     @Query("SELECT c FROM Capsule c WHERE c.isDeleted = false ORDER BY c.createTime DESC")
     List<Capsule> findAllNotDeleted();

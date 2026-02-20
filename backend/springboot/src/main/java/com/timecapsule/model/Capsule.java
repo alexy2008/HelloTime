@@ -31,8 +31,8 @@ public class Capsule {
     @Column(name = "open_time", nullable = false)
     private LocalDateTime openTime;
     
-    @Column(length = 50)
-    private String author;
+    @Column(name = "creator_nickname", length = 50)
+    private String creatorNickname;
     
     @CreationTimestamp
     @Column(name = "create_time")
@@ -44,8 +44,22 @@ public class Capsule {
     /**
      * 检查胶囊是否已到开启时间
      */
+    public boolean canOpen() {
+        return !LocalDateTime.now().isBefore(this.openTime);
+    }
+    
+    // 向后兼容
     public boolean isOpen() {
-        return LocalDateTime.now().isAfter(this.openTime) || 
-               LocalDateTime.now().isEqual(this.openTime);
+        return canOpen();
+    }
+    
+    // 向后兼容
+    public String getAuthor() {
+        return creatorNickname;
+    }
+    
+    // 向后兼容
+    public void setAuthor(String author) {
+        this.creatorNickname = author;
     }
 }
